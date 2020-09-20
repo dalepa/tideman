@@ -1,0 +1,160 @@
+#TIDEMAN PI0W Build process 1.0
+# Build a headless piow to use BarryLan to configure and install graphite and grafana for metrics
+# 
+0. Install pi0w on sdcard and boot
+2. Install Grafana   
+3. Install BerryLan  
+4. Install GRAPHITE
+5. Test Graphite
+6. Test Grafana
+
+0. Flash a SD card with Raspberry PI Imager
+#   a: https://www.raspberrypi.org/downloads/
+	b: Flash with recommended image
+	
+1. ######### Graphana
+# 
+
+
+wget https://raw.githubusercontent.com/trashware/grafana-rpi-zero/master/grafana_6.0.1_armhf.deb
+sudo apt-get install adduser libfontconfig
+sudo dpkg -i grafana_6.0.1_armhf.deb
+sudo update-rc.d grafana-server defaults
+sudo service grafana-server start
+reboot
+service grafana-server status
+sudo systemctl enable grafana-server.service
+TEST GRAFANA: http://<IP ADDRESS>:3000
+
+
+2. ############ BerryLan http://berrylan.org
+
+echo "deb http://ci-repo.nymea.io/experimental-silo buster rpi" | sudo tee /etc/apt/sources.list.d/nymea.list
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key A1A19ED6
+
+# Create nymea 
+cat > /etc/apt/preferences.d/nymea <<- "EOF
+Package: *
+Pin: release c=raspbian
+Pin-Priority: 700
+
+Package: *
+Pin: origin repository.nymea.io c=main
+Pin-Priority: 500
+EOF
+
+# Install nymea-networkmanager
+sudo apt-get update
+sudo apt-get install nymea-networkmanager dirmngr
+sudo systemctl disable dhcpcd
+reboot
+
+
+
+3 ########### APACHE #############
+sudo apt install apache2 -y
+
+
+4. ############# GRAPHITE ###############
+#  https://markinbristol.wordpress.com/2015/09/20/setting-up-graphite-api-grafana-on-a-raspberry-pi/
+
+pip install graphyte
+pip install statistics
+apt-get install graphite-carbon
+
+
+#edit /etc/default/graphite-carbon and change the line below to true:
+
+cat > /etc/default/graphite-carbon <<- "EOF"
+CARBON_CACHE_ENABLED=true
+EOF
+
+	
+
+#GRAPHITE API
+https://markinbristol.wordpress.com/2015/09/20/setting-up-graphite-api-grafana-on-a-raspberry-pi/
+
+
+
+apt-get install python python-pip build-essential python-dev libcairo2-dev libffi-dev
+pip install graphite-api
+pip install graphite-api[sentry,cyanite]
+apt-get install libapache2-mod-wsgi
+
+mkdir /var/www/wsgi-scripts
+echo "from graphite_api.app import app as application" > /var/www/wsgi-scripts/graphite-api.wsgi
+
+#Create “/etc/graphite-api.yaml” with the following contents.
+#------------------------
+cat > /etc/graphite-api.yaml <<- "EOF"
+
+search_index: /var/lib/graphite/index
+finders:
+  - graphite_api.finders.whisper.WhisperFinder
+functions:
+  - graphite_api.functions.SeriesFunctions
+  - graphite_api.functions.PieFunctions
+whisper:
+  directories:
+    - /var/lib/graphite/whisper
+carbon:
+  hosts:
+    - 127.0.0.1:7002
+  timeout: 1
+  retry_delay: 15
+  carbon_prefix: carbon
+  replication_factor: 1
+
+EOF
+#------------------------
+
+
+
+# Create /etc/apache2/sites-available/graphite.conf
+#------------------------
+cat > /etc/apache2/sites-available/graphite.conf <<- "EOF"
+
+LoadModule wsgi_module modules/mod_wsgi.so
+WSGISocketPrefix /var/run/wsgi
+Listen 8013
+<VirtualHost *:8013>
+
+ WSGIDaemonProcess graphite-api processes=5 threads=5 display-name='%{GROUP}' inactivity-timeout=120
+ WSGIProcessGroup graphite-api
+ WSGIApplicationGroup %{GLOBAL}
+ WSGIImportScript /var/www/wsgi-scripts/graphite-api.wsgi process-group=graphite-api application-group=%{GLOBAL}
+
+ WSGIScriptAlias / /var/www/wsgi-scripts/graphite-api.wsgi
+
+ <Directory /var/www/wsgi-scripts/>
+ Order deny,allow
+ Allow from all
+ </Directory>
+ </VirtualHost>
+
+EOF
+#------------------------
+ 
+# Then symlink this into /etc/apache2/sites-enabled/
+cd /etc/apache2/sites-enabled/
+ln -s ../sites-available/graphite.conf .
+service apache2 restart
+
+
+5. TEST GRAPHITE
+#TEST graphite
+test.py
+	import time
+	import socket
+	sock = socket.socket()
+	sock.connect( ("localhost", 2003) )
+	sock.send("test.metric 50 %d \n" % time.time())
+	sock.close()
+	
+	If this returns a “socket.error”, check if carbon is running with “ps -ef | grep carbon”, and check for errors in /var/log/carbon/console.log
+	
+# TEST grafana	
+# https://github.com/dalepa/graphyte
+# git clone https://github.com/dalepa/graphyte
+python cpu2grafite
+
