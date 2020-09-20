@@ -2,6 +2,13 @@
 #encoding:utf-8
 
 
+# Author Dan Pancamo
+# Description: Get the distance to the water and calculate a bunch of stats
+# HARDWARE
+	# Rasapberry pi0w https://amzn.to/32Le5c6
+	# JSN-SR04T https://amzn.to/2FDJjcK 
+
+
 
 from gpiozero import CPUTemperature
 
