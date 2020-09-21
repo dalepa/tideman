@@ -3,7 +3,10 @@
 
 
 # Author Dan Pancamo
-# Description: Get the distance to the water and calculate a bunch of stats
+# Description Get the distance to the water and calculate a bunch of stats
+	# Push to Grafana
+	# Watch the tide come in
+	
 # HARDWARE
 	# Rasapberry pi0w https://amzn.to/32Le5c6
 	# JSN-SR04T https://amzn.to/2FDJjcK 
@@ -127,10 +130,10 @@ if __name__ == '__main__':
 			print "---------------------  time left ----------------", MAXFLOWTIME -(time.time() - flowstarttime)
 
 
-			WaterLevelHigh=SENSORHEIGHTINFEET-((distlow*0.393701)/12)-SENSORABOVEPIERINFEET
-			WaterLevelLow=SENSORHEIGHTINFEET-((disthigh*0.393701)/12)-SENSORABOVEPIERINFEET
-			WaterLevelAvg=SENSORHEIGHTINFEET-((distavg*0.393701)/12)-SENSORABOVEPIERINFEET
-			WaterLevelMedian=SENSORHEIGHTINFEET-((medianDistance*0.393701)/12)-SENSORABOVEPIERINFEET
+			WaterLevelHigh=SENSORHEIGHTINFEET-((distlow*0.393701)/12)
+			WaterLevelLow=SENSORHEIGHTINFEET-((disthigh*0.393701)/12)
+			WaterLevelAvg=SENSORHEIGHTINFEET-((distavg*0.393701)/12)
+			WaterLevelMedian=SENSORHEIGHTINFEET-((medianDistance*0.393701)/12)
 			WaveHeight=(waveheight*0.393701)
 	
 			print("wu.{}.{}.WaterLevelHigh {:.0f} {}".format( myws, mywslocation, time.time(), WaterLevelHigh))
