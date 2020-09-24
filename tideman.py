@@ -119,13 +119,13 @@ if __name__ == '__main__':
 
 			#print mDistance
 
-			distlow = mDistance[10]
-			disthigh = mDistance[90]
-			distavg = statistics.mean(mDistance[10:90])
+			distlow = mDistance[20]
+			disthigh = mDistance[80]
+			distavg = statistics.mean(mDistance[20:80])
 
 
 			waveheight = disthigh - distlow
-			medianDistance = statistics.median(mDistance[10:90])
+			medianDistance = statistics.median(mDistance[20:80])
 
 			print "---------------------  time left ----------------", MAXFLOWTIME -(time.time() - flowstarttime)
 
