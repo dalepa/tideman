@@ -1,6 +1,10 @@
 #TIDEMAN PI0W Build process 1.0
 # Build a headless piow to use BarryLan to configure and install graphite and grafana for metrics
 # 
+# 
+#
+
+
 0. Install pi0w on sdcard and boot
 2. Install Grafana   
 3. Install BerryLan  
@@ -11,7 +15,10 @@
 0. Flash a SD card with Raspberry PI Imager
 #   a: https://www.raspberrypi.org/downloads/
 	b: Flash with recommended image
-	
+
+Packages
+	pip install graphyte
+
 1. ######### Graphana
 # 
 
