@@ -86,6 +86,9 @@ def read_me007ys(ser, timeout = 1.0):
 
 def toGraphite(mDistance):
 
+
+		cpu = CPUTemperature()
+
 		mDistance.sort()
 
 		#print mDistance
@@ -100,18 +103,18 @@ def toGraphite(mDistance):
 
 
 
-		WaterLevelHigh=SENSORHEIGHTINFEET-((distlow*0.0393701)/12)-SENSORABOVEPIERINFEET
-		WaterLevelLow=SENSORHEIGHTINFEET-((disthigh*0.0393701)/12)-SENSORABOVEPIERINFEET
-		WaterLevelAvg=SENSORHEIGHTINFEET-((distavg*0.0393701)/12)-SENSORABOVEPIERINFEET
-		WaterLevelMedian=SENSORHEIGHTINFEET-((medianDistance*0.0393701)/12)-SENSORABOVEPIERINFEET
+		WaterLevelHigh=SENSORHEIGHTINFEET-((distlow*0.0393701)/12)
+		WaterLevelLow=SENSORHEIGHTINFEET-((disthigh*0.0393701)/12)
+		WaterLevelAvg=SENSORHEIGHTINFEET-((distavg*0.0393701)/12)
+		WaterLevelMedian=SENSORHEIGHTINFEET-((medianDistance*0.0393701)/12)
 		WaveHeight=(waveheight*0.0393701)
 
-		print("wu.{}.{}.WaterLevelHigh {:.0f} {}".format( myws, mywslocation, time.time(), WaterLevelHigh))
-		print("wu.{}.{}.WaterLevelLow {:.0f} {}".format( myws, mywslocation, time.time(), WaterLevelLow))
-		print("wu.{}.{}.WaterLevelAvg {:.0f} {}".format( myws, mywslocation, time.time(), WaterLevelAvg))
-		print("wu.{}.{}.WaveHeight {:.0f} {}".format( myws, mywslocation, time.time(), WaveHeight))
-		print("wu.{}.{}.WaterLevelMedian {:.0f} {}".format( myws, mywslocation, time.time(), WaterLevelMedian))
-		print("wu.{}.{}.CpuTemp {:.0f} {}".format( myws, mywslocation, time.time(), ((cpu.temperature * (9/5)) + 32)))
+		print("WaterLevelHigh=",WaterLevelHigh)
+		print("WaterLevelLow=",WaterLevelLow)
+		print("WaterLevelAvg=",WaterLevelAvg)
+		print("WaterLevelMedian=",WaterLevelMedian)
+		print("WaveHeight=",WaveHeight)
+		print("-------------------------------")
 
 
 		graphyte.send('WaterLevelHigh', WaterLevelHigh)
@@ -122,10 +125,33 @@ def toGraphite(mDistance):
 		graphyte.send('CpuTemp',((cpu.temperature * (9/5)) + 32))
 
 
-
-
 		return
-	
+
+
+
+#		if flowsstartdepth == 0:
+#			flowsstartdepth = WaterLevelLow
+#	else:
+#		count = count + 1
+#		distavg = distavg + distance
+#
+#	if ((time.time() - flowstarttime) > MAXFLOWTIME):
+#		flowtime = time.time() - flowstarttime
+#
+#		flowstopdepth = WaterLevelLow
+#		flowrateinperhour = (((flowstopdepth - flowsstartdepth) * 3600 ) / flowtime)*12
+#
+#
+#		print "flowsstartdepth = ", flowsstartdepth
+#		print "flowstopdepth = ", flowstopdepth
+#		print "flowtime = ", flowtime
+#		print "flowrateinperhour = ", flowrateinperhour
+#		graphyte.send('WaterFlowRatePerHour',flowrateinperhour)  #in inches
+#
+#		flowsstartdepth = 0 
+#		flowstarttime = time.time()
+
+
 
 if __name__ == '__main__':
 	try:
@@ -135,14 +161,12 @@ if __name__ == '__main__':
 		while True:
 			distance = read_me007ys(serialport)
 			#print("CURRENT = %.1f in" % (distance*0.0393701))
+
 			mDistance[count] = distance
-
-
 		
-			cpu = CPUTemperature()
 
 			if count == 99:
-				print (mDistance)
+				#print (mDistance)
 				toGraphite(mDistance)
 				count = 0
 			else:
