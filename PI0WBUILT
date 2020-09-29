@@ -5,7 +5,7 @@
 #
 
 
-0. Install pi0w on sdcard and boot
+0. Install pi0w on sdcard using raspberry pi imager raspberi pi OS and boot
 2. Install Grafana   
 3. Install BerryLan  
 4. Install GRAPHITE
