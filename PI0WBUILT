@@ -11,6 +11,7 @@
 4. Install GRAPHITE
 5. Test Graphite
 6. Test Grafana
+7  Setup Serial port
 
 0. Flash a SD card with Raspberry PI Imager
 #   a: https://www.raspberrypi.org/downloads/
@@ -31,8 +32,6 @@
 	f: place th sdcard into the PI and power on
 	g: search for the IP address using your home router
 
-Packages
-	pip install graphyte
 
 1. ######### Graphana
 # 
@@ -55,7 +54,8 @@ echo "deb http://ci-repo.nymea.io/experimental-silo buster rpi" | sudo tee /etc/
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key A1A19ED6
 
 # Create nymea 
-cat > /etc/apt/preferences.d/nymea <<- "EOF
+sudo su -
+cat > /etc/apt/preferences.d/nymea <<- "EOF"
 Package: *
 Pin: release c=raspbian
 Pin-Priority: 700
@@ -67,9 +67,9 @@ EOF
 
 # Install nymea-networkmanager
 sudo apt-get update
-sudo apt-get install nymea-networkmanager dirmngr
-sudo systemctl disable dhcpcd
-reboot
+sudo apt-get install nymea-networkmanager dirmngr  (will restart the netowrk with new IP)
+sudo systemctl disable dhcpcd 
+reboot needed
 
 
 
@@ -80,13 +80,14 @@ sudo apt install apache2 -y
 4. ############# GRAPHITE ###############
 #  https://markinbristol.wordpress.com/2015/09/20/setting-up-graphite-api-grafana-on-a-raspberry-pi/
 
-pip install graphyte
-pip install statistics
-apt-get install graphite-carbon
+sudo pip install graphyte
+sudo pip install statistics
+sudo apt-get install graphite-carbon
 
 
 #edit /etc/default/graphite-carbon and change the line below to true:
 
+sudo su -
 cat > /etc/default/graphite-carbon <<- "EOF"
 CARBON_CACHE_ENABLED=true
 EOF
