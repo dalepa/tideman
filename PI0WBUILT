@@ -7,7 +7,7 @@
 
 0. Install pi0w on sdcard 
 2. Install Grafana   
-3. Install BerryLan  
+3. Install BerryLan  (DO this last)
 4. Install GRAPHITE
 5. Test Graphite
 6. Test Grafana
@@ -48,7 +48,8 @@ sudo systemctl enable grafana-server.service
 TEST GRAFANA: http://<IP ADDRESS>:3000
 
 
-2. ############ BerryLan http://berrylan.org
+2. ############ BerryLan http://berrylan.org (SKIP DO  LAST IF WANTED/    Screwey
+)
 
 echo "deb http://ci-repo.nymea.io/experimental-silo buster rpi" | sudo tee /etc/apt/sources.list.d/nymea.list
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key A1A19ED6
@@ -74,16 +75,19 @@ reboot needed
 
 
 3 ########### APACHE #############
+sudo apt-get update
 sudo apt install apache2 -y
 
 
 4. ############# GRAPHITE ###############
 #  https://markinbristol.wordpress.com/2015/09/20/setting-up-graphite-api-grafana-on-a-raspberry-pi/
 
-sudo pip install graphyte
-sudo pip install statistics
-sudo apt-get install graphite-carbon
 
+
+sudo apt-get install graphite-carbon
+sudo pip install graphyte
+sudo pip3 install graphyte
+sudo pip install statistics
 
 #edit /etc/default/graphite-carbon and change the line below to true:
 
@@ -98,7 +102,7 @@ EOF
 https://markinbristol.wordpress.com/2015/09/20/setting-up-graphite-api-grafana-on-a-raspberry-pi/
 
 
-
+sudo su -
 apt-get install python python-pip build-essential python-dev libcairo2-dev libffi-dev
 pip install graphite-api
 pip install graphite-api[sentry,cyanite]
@@ -158,9 +162,11 @@ Listen 8013
 EOF
 #------------------------
  
+
 # Then symlink this into /etc/apache2/sites-enabled/
 cd /etc/apache2/sites-enabled/
 ln -s ../sites-available/graphite.conf .
+
 service apache2 restart
 
 
@@ -176,8 +182,19 @@ test.py
 	
 	If this returns a “socket.error”, check if carbon is running with “ps -ef | grep carbon”, and check for errors in /var/log/carbon/console.log
 	
+	 TEST GRAPHTITE http://<IP_OF_PI >:8013/render?target=test.metric
+	 should see a graph
+	
+6. SETUP DATASTORE
+BROWSE TO GRAFANA: http://<IP ADDRESS>:3000   admin/admin
+add datasource http://localhost:8013
+
+	
 # TEST grafana	
 # https://github.com/dalepa/graphyte
 # git clone https://github.com/dalepa/graphyte
 python cpu2grafite
+# get clone https://github.com/dalepa/tideman.git
+
+7 raspi-config  -> Disable Serial Console and Enable serial port
 
