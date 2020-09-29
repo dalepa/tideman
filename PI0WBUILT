@@ -15,8 +15,21 @@
 0. Flash a SD card with Raspberry PI Imager
 #   a: https://www.raspberrypi.org/downloads/
 	b: Flash with recommended image
-	c: reboot
+	c: remove SDcard and insert again.  The SDcard should mount
+	d: add a file called "ssh"  with no extention
+	e: add a file called wpa_supplicant.conf
 	
+		country=us
+		update_config=1
+		ctrl_interface=/var/run/wpa_supplicant
+
+		network={
+ 			scan_ssid=1
+ 			ssid="cam24"
+ 			psk="olivia15"
+		}
+	f: place th sdcard into the PI and power on
+	g: search for the IP address using your home router
 
 Packages
 	pip install graphyte
