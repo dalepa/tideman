@@ -1,1 +1,24 @@
-TideMan 1.0
+TideMan 2.0  
+
+Description
+  Using a Sonar sensor, measure the distance to the water from the side of a pier and send the data to a local Grafana/Graphite insance
+
+Hardware
+  Serial Sensors 
+    Large Ultrasonic (Sonar) Sensor with Horn and UART Output
+    Panel Mount Ultrasonic (Sonar) Ranging Module with UART Output
+  Raspberry PI Zero W  https://www.adafruit.com/product/3708
+  
+Horn: https://www.adafruit.com/product/4664
+Panel Mount https://www.adafruit.com/product/4665
+
+https://cdn-shop.adafruit.com/product-files/4664/4664_datasheet.pdf
+
+To use, simply connect the following  
+
+red wire      #1 to 5V          PI #4
+black wire    #2 to ground      PI #6
+skip          #3  
+connect       #4                PI #10  serial input pin 
+read the data in at 9600 baud.
+
