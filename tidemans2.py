@@ -198,6 +198,7 @@ if __name__ == '__main__':
 				#print (mDistance)
 				toGraphite(mDistance,CpuUtil/100)
 				count = 0
+				CpuUtil = 0
 			else:
 				count = count + 1
 				
