@@ -2,12 +2,18 @@
 #encoding:utf-8
 #
 
-
 # Author Dan Pancamo
 # Description: Get the distance to the water and calculate a bunch of stats
 # HARDWARE
 	# Rasapberry pi0w https://amzn.to/32Le5c6
 	# adafruit ultrasonic 4884
+
+# Updates
+# 10/2/2020  Added CpuUtil
+
+
+
+
 
 
 
@@ -15,6 +21,7 @@ from gpiozero import CPUTemperature
 
 
 
+import psutil
 import graphyte
 
 import time
@@ -31,6 +38,7 @@ distavg = 0
 count = 0 
 medianDistance = 0
 mDistance = [0] * 100
+CpuUtil = 0
 
 
 #SENSORLOCATION 
@@ -88,7 +96,7 @@ def read_me007ys(ser, timeout = 1.0):
     return None
 
 
-def toGraphite(mDistance):
+def toGraphite(mDistance,CpuUtil):
 
 
 		cpu = CPUTemperature()
@@ -97,13 +105,13 @@ def toGraphite(mDistance):
 
 		#print mDistance
 
-		distlow = mDistance[10]
-		disthigh = mDistance[90]
-		distavg = statistics.mean(mDistance[10:90])
+		distlow = mDistance[5]
+		disthigh = mDistance[95]
+		distavg = statistics.mean(mDistance[5:95])
 
 
 		waveheight = disthigh - distlow
-		medianDistance = statistics.median(mDistance[10:90])
+		medianDistance = statistics.median(mDistance[5:95])
 
 
 
@@ -112,12 +120,15 @@ def toGraphite(mDistance):
 		WaterLevelAvg=SENSORHEIGHTINFEET-((distavg*0.0393701)/12)
 		WaterLevelMedian=SENSORHEIGHTINFEET-((medianDistance*0.0393701)/12)
 		WaveHeight=(waveheight*0.0393701)
+		CpuTemp = (cpu.temperature * (9/5)) + 32
 
 		print("WaterLevelHigh=",WaterLevelHigh)
 		print("WaterLevelLow=",WaterLevelLow)
 		print("WaterLevelAvg=",WaterLevelAvg)
 		print("WaterLevelMedian=",WaterLevelMedian)
 		print("WaveHeight=",WaveHeight)
+		print("CpuTemp=",CpuTemp)
+		print("CpuUtil=",CpuUtil)
 
 		print("----------sender 1---------------------")
 
@@ -127,7 +138,8 @@ def toGraphite(mDistance):
 		sender1.send('WaterLevelAvg', WaterLevelAvg)
 		sender1.send('WaterLevelMedian', WaterLevelMedian)
 		sender1.send('WaveHeight', WaveHeight)
-		sender1.send('CpuTemp',((cpu.temperature * (9/5)) + 32))
+		sender1.send('CpuTemp',CpuTemp)
+		sender1.send('CpuUtil',CpuUtil)
 
 		print("----------sender 2---------------------")
 		sender2.send('WaterLevelHigh', WaterLevelHigh)
@@ -135,7 +147,8 @@ def toGraphite(mDistance):
 		sender2.send('WaterLevelAvg', WaterLevelAvg)
 		sender2.send('WaterLevelMedian', WaterLevelMedian)
 		sender2.send('WaveHeight', WaveHeight)
-		sender2.send('CpuTemp',((cpu.temperature * (9/5)) + 32))
+		sender2.send('CpuTemp',CpuTemp)
+		sender2.send('CpuUtil',CpuUtil)
 
 		print("----------done---------------------")
 
@@ -178,10 +191,12 @@ if __name__ == '__main__':
 
 			mDistance[count] = distance
 		
+			Cpu =  psutil.cpu_percent(percpu=True)
+			CpuUtil = CpuUtil + Cpu[0]
 
 			if count == 99:
 				#print (mDistance)
-				toGraphite(mDistance)
+				toGraphite(mDistance,CpuUtil/100)
 				count = 0
 			else:
 				count = count + 1
