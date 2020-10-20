@@ -135,6 +135,11 @@ carbon:
 EOF
 #------------------------
 
+vi /etc/carbon/storage-schemas.conf  update the default pattern to the following
+
+[default_1min_for_1day]
+pattern = .*
+retentions = 10s:1d,1m:7d,10m:1y
 
 
 # Create /etc/apache2/sites-available/graphite.conf
