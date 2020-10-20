@@ -135,11 +135,13 @@ carbon:
 EOF
 #------------------------
 
-vi /etc/carbon/storage-schemas.conf  update the default pattern to the following
-
-[default_1min_for_1day]
-pattern = .*
-retentions = 10s:1d,1m:7d,10m:1y
+# Create retentions for graphana data collection
+#------------------------
+cat >> /etc/carbon/storage-schemas.conf  <<- "EOF"
+[tideman]
+pattern = wu.*
+retentions = 1s:2d,10s:7d,60s:30d,3600s:720d
+EOF
 
 
 # Create /etc/apache2/sites-available/graphite.conf
