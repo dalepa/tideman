@@ -140,7 +140,7 @@ EOF
 cat >> /etc/carbon/storage-schemas.conf  <<- "EOF"
 [tideman]
 pattern = wu.*
-retentions = 1s:2d,10s:7d,60s:30d,3600s:720d
+retentions = 1s:365d,10s:7d,1m:1y
 EOF
 
 
