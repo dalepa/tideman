@@ -39,6 +39,7 @@ count = 0
 medianDistance = 0
 mDistance = [0] * 100
 CpuUtil = 0
+lastDistance = 0
 
 
 #SENSORLOCATION 
@@ -52,7 +53,7 @@ MAXFLOWTIME=(60*60)
 
 
 GRAPHITE="localhost"
-HOT="hot.pancamo.com"
+HOT="192.168.1.144"
 myws="KTXOLIVI"
 mywslocation="PancamoPointPier"
 
@@ -185,8 +186,20 @@ if __name__ == '__main__':
 
 		count = 0
 
+		lastDistance = read_me007ys(serialport)
+		print("lastDistance = %.1f in" % (lastDistance*0.0393701))
+
 		while True:
 			distance = read_me007ys(serialport)
+
+			# Discard data more 20% higher than the precious sample aka bad data
+			if distance < (lastDistance * .7) or distance > (lastDistance * 1.3) :
+				distance = lastDistance
+				print("error - distance = %.1f in" % (distance*0.0393701))
+				print("error - lastDistance = %.1f in" % (lastDistance*0.0393701))
+			else:
+				lastDistance = distance
+
 			#print("CURRENT = %.1f in" % (distance*0.0393701))
 
 			mDistance[count] = distance
